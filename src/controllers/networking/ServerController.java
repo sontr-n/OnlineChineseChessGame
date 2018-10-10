@@ -7,8 +7,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import controllers.ActionType;
-import controllers.HomeController;
 import controllers.LoginController;
+import controllers.RegisterController;
 import models.DataPackage;
 import models.User;
 import utils.ServerConfig;
@@ -48,11 +48,25 @@ public class ServerController {
 		System.out.println("sign in");
 		User u = (User)dp.getData();
 		try {
-				boolean isCorrect = LoginController.getInstance().checkUser((User)dp.getData());
-				if (isCorrect)
+				boolean isOK = LoginController.getInstance().checkUser((User)dp.getData());
+				if (isOK)
 					oos.writeObject(new DataPackage(new Boolean(true), ActionType.SIGN_IN));
 				else 
 					oos.writeObject(new DataPackage(new Boolean(false), ActionType.SIGN_IN));
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public void handleSignUp(DataPackage dp) {
+		System.out.println("sign up");
+		User u = (User)dp.getData();
+		try {
+				boolean isOK = RegisterController.getInstance().addUser((User)dp.getData());
+				if (isOK)
+					oos.writeObject(new DataPackage(new Boolean(true), ActionType.SIGN_UP));
+				else 
+					oos.writeObject(new DataPackage(new Boolean(false), ActionType.SIGN_UP));
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -70,6 +84,10 @@ public class ServerController {
 					if (dp.getActionType() == ActionType.SIGN_IN) {
 						handleSignIn(dp);
 					}
+					
+					if (dp.getActionType() == ActionType.SIGN_UP) {
+						handleSignUp(dp);
+					}
 	//					
 					//continue
 					
@@ -80,7 +98,7 @@ public class ServerController {
 					break;
 				}
 			}
-			client.close();
+//			client.close();
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} 

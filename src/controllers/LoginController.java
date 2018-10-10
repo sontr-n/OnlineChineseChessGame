@@ -14,13 +14,12 @@ import views.LoginView;
 public class LoginController implements BaseController {
 	private LoginView loginView;
 	private User user;
-	private boolean clicked;
 	
 	
 	private LoginController() {
 		loginView = new LoginView();
 		loginView.addLoginListener(new LoginListener());
-		clicked = false;
+		loginView.addRegisterListener(new RegisterListener());
 	}
 	
 	class LoginListener implements ActionListener {
@@ -34,6 +33,16 @@ public class LoginController implements BaseController {
 				hiddenView();
 				HomeController.getInstance().displayView();
 			}
+		}
+		
+	}
+	
+	class RegisterListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			RegisterController.getInstance().displayView();
+			hiddenView();
 		}
 		
 	}
