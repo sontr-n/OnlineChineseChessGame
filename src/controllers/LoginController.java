@@ -3,6 +3,9 @@ package controllers;
 import java.awt.Desktop.Action;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.xml.crypto.Data;
 
@@ -28,11 +31,12 @@ public class LoginController implements BaseController {
 		public void actionPerformed(ActionEvent e) {
 			ClientController.getInstance().sendData(new DataPackage(loginView.getUser(), ActionType.SIGN_IN));
 			DataPackage dp = ClientController.getInstance().receiveData();
-//			System.out.println(dp == null);
 			if ((Boolean)dp.getData()) {
+				loginView.showMessage("Sign In Successfully");
 				hiddenView();
 				HomeController.getInstance().displayView();
-			}
+			} else 
+				loginView.showMessage("Check your username/password");
 		}
 		
 	}
@@ -63,9 +67,22 @@ public class LoginController implements BaseController {
 	
 	public boolean checkUser(User u) {
 		//get user data from DB and check 
-		if (u.getUsername().equals("son"))
-			return true;
-		return false;
+		DAO dao = new DAO();
+		Statement stm = dao.connect();
+		boolean isOK = false;
+		try {
+			ResultSet rs = stm.executeQuery("SELECT * FROM users WHERE username= '" + u.getUsername() + "'");
+			if (rs.first()) {
+				String pw = rs.getString("password");
+				if (pw.equals(String.valueOf(u.getPassword())))
+					isOK = true;
+			}
+			
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
+		dao.closeConnection();
+		return isOK;
 	}
 	
 	public DataPackage packData() {
