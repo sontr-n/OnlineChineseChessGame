@@ -1,6 +1,7 @@
 package views;
 
 
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -64,23 +65,34 @@ public class HomeView extends JFrame {
 		topPanel.add(btnSignOut);
 		
 		txtUsername = new JTextArea();
+		txtUsername.setText("123123");
 		txtUsername.setBackground(UIManager.getColor("Button.background"));
-		txtUsername.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		txtUsername.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		txtUsername.setEditable(false);
-		txtUsername.setBounds(124, 12, 97, 22);
+		txtUsername.setBounds(124, 16, 97, 22);
 		topPanel.add(txtUsername);
 		
 		txtScore = new JTextArea();
+		txtScore.setText("132");
 		txtScore.setBackground(UIManager.getColor("Button.background"));
 		txtScore.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		txtScore.setEditable(false);
-		txtScore.setEnabled(false);
 		txtScore.setBounds(124, 47, 97, 22);
 		topPanel.add(txtScore);
 		
 		btnRanking = new JButton("Ranking");
 		btnRanking.setBounds(356, 13, 97, 25);
 		topPanel.add(btnRanking);
+		
+		JLabel lblUsername = new JLabel("Username:");
+		lblUsername.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lblUsername.setBounds(37, 17, 86, 21);
+		topPanel.add(lblUsername);
+		
+		JLabel lblScore = new JLabel("Score:");
+		lblScore.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lblScore.setBounds(64, 50, 48, 16);
+		topPanel.add(lblScore);
 		
 		
 		//configure bottomPanel
@@ -118,5 +130,13 @@ public class HomeView extends JFrame {
 	public void setUserInfo(User u) {
 		txtUsername.setText(u.getUsername());
 		txtScore.setText(Double.toString(u.getScore()));
+	}
+	
+	public void addSignOutListener(ActionListener so) {
+		btnSignOut.addActionListener(so);
+	}
+	
+	public void addRankingListner(ActionListener r) {
+		btnSignOut.addActionListener(r);
 	}
 }

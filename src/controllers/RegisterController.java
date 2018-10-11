@@ -1,6 +1,11 @@
 package controllers;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.PreparedStatement;
 
 import controllers.networking.ClientController;
 import models.DataPackage;
@@ -29,6 +34,9 @@ public class RegisterController implements BaseController {
 			if (isOK) {
 				registerView.showMessage("Sign Up Successfully");
 				hiddenView();
+				
+				UserController.getInstance().setUser(registerView.getUser());
+				
 				HomeController.getInstance().displayView();
 			}
 			else 
@@ -55,6 +63,7 @@ public class RegisterController implements BaseController {
 
 	@Override
 	public void displayView() {
+		updateView();
 		registerView.setVisible(true);
 	}
 	
@@ -71,9 +80,19 @@ public class RegisterController implements BaseController {
 	}
 	
 	public boolean addUser(User u) {
-		//connect Database
-		if (u.getUsername().equals("son"))
-			return true;
+		//connect DB
+		DAO dao = new DAO();
+		Connection con = dao.connect();
+		try {
+			PreparedStatement pstm = con.prepareStatement("INSERT INTO users (username, password) values (?, ?)"); 
+			pstm.setString(1, u.getUsername());
+			pstm.setString(2, String.valueOf(u.getPassword()));
+			int count = pstm.executeUpdate();
+			if (count > 0)
+				return true;
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+		}
 		return false;
 	}
 	

@@ -3,6 +3,7 @@ package controllers;
 import java.awt.Desktop.Action;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -31,10 +32,15 @@ public class LoginController implements BaseController {
 		public void actionPerformed(ActionEvent e) {
 			ClientController.getInstance().sendData(new DataPackage(loginView.getUser(), ActionType.SIGN_IN));
 			DataPackage dp = ClientController.getInstance().receiveData();
-			if ((Boolean)dp.getData()) {
+			if (dp.getData() != null) {
 				loginView.showMessage("Sign In Successfully");
 				hiddenView();
+				
+				UserController.getInstance().setLogedIn(true);
+				UserController.getInstance().setUser(loginView.getUser());
+				
 				HomeController.getInstance().displayView();
+				
 			} else 
 				loginView.showMessage("Check your username/password");
 		}
@@ -55,34 +61,39 @@ public class LoginController implements BaseController {
 	//Updating View
 	@Override
 	public void updateView() {
-	
+		
 	}
+	
 	
 	
 	//Representation View
 	@Override
 	public void displayView() {
+		updateView();
 		loginView.setVisible(true);
 	}
 	
-	public boolean checkUser(User u) {
+	public DataPackage getUser(User u) {
 		//get user data from DB and check 
 		DAO dao = new DAO();
-		Statement stm = dao.connect();
-		boolean isOK = false;
+		Connection con = dao.connect();
+		DataPackage dp = null;
 		try {
+			Statement stm = con.createStatement();
 			ResultSet rs = stm.executeQuery("SELECT * FROM users WHERE username= '" + u.getUsername() + "'");
 			if (rs.first()) {
 				String pw = rs.getString("password");
-				if (pw.equals(String.valueOf(u.getPassword())))
-					isOK = true;
+				if (pw.equals(String.valueOf(u.getPassword()))) {
+					User user = new User(rs.getInt(1), rs.getString(2), rs.getString(3).toCharArray(), rs.getDouble(4));
+					dp = new DataPackage(user, ActionType.SIGN_IN);
+				}
 			}
 			
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		}
 		dao.closeConnection();
-		return isOK;
+		return dp;
 	}
 	
 	public DataPackage packData() {

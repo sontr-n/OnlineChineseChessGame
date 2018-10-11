@@ -48,11 +48,11 @@ public class ServerController {
 		System.out.println("sign in");
 		User u = (User)dp.getData();
 		try {
-				boolean isOK = LoginController.getInstance().checkUser((User)dp.getData());
-				if (isOK)
-					oos.writeObject(new DataPackage(new Boolean(true), ActionType.SIGN_IN));
+				DataPackage re = LoginController.getInstance().getUser(u);
+				if (re != null)
+					oos.writeObject(new DataPackage(re, ActionType.SIGN_IN));
 				else 
-					oos.writeObject(new DataPackage(new Boolean(false), ActionType.SIGN_IN));
+					oos.writeObject(new DataPackage(re, ActionType.SIGN_IN));
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -94,7 +94,7 @@ public class ServerController {
 	//				} catch (ClassNotFoundException ex) {
 	//					ex.printStackTrace();
 				} catch (Exception ex) {
-					ex.printStackTrace();
+					System.err.println(ex);
 					break;
 				}
 			}

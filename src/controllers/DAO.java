@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.mysql.jdbc.PreparedStatement;
+
 import utils.DatabaseConfig;
 
 public class DAO {
@@ -17,12 +19,11 @@ public class DAO {
 		
 	}
 	
-	public Statement connect() {
+	public Connection connect() {
 		try {
 			Class.forName(className);
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/"+dbName, username, password);
-			Statement stm = con.createStatement();
-			return stm;
+			return con;
 			
 		} catch (ClassNotFoundException ex) {
 			ex.printStackTrace();
@@ -31,6 +32,7 @@ public class DAO {
 		}
 		return null;
 	}
+	
 	
 	public void closeConnection() {
 		try {

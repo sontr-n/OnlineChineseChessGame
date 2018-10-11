@@ -7,6 +7,7 @@ public class User implements Serializable {
 	private String username;
 	private char[] password;
 	private double score;
+	private int id;
 	private boolean isBusy;
 	
 	
@@ -16,9 +17,20 @@ public class User implements Serializable {
 		isBusy = false;
 	}
 	
+	public User(int id, String u, char[] p, double s) {
+		this.id = id;
+		username = u;
+		password = p;
+		score = s;
+	}
+	
 	
 	public User() {
 		
+	}
+	
+	public int getId() {
+		return id;
 	}
 	
 	
