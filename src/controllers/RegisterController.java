@@ -5,11 +5,15 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import javax.swing.table.TableModel;
+
 import java.sql.PreparedStatement;
 
 import controllers.networking.ClientController;
 import models.DataPackage;
 import models.User;
+import views.HomeView;
 import views.RegisterView;
 
 
@@ -29,19 +33,6 @@ public class RegisterController implements BaseController {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			ClientController.getInstance().sendData(new DataPackage(registerView.getUser(), ActionType.SIGN_UP));
-			DataPackage dp = ClientController.getInstance().receiveData();
-			boolean isOK = (Boolean)dp.getData();
-			if (isOK) {
-				registerView.showMessage("Sign Up Successfully");
-				hiddenView();
-				
-				UserController.getInstance().setUser(registerView.getUser());
-				
-				HomeController.getInstance().displayView();
-			}
-			else 
-				registerView.showMessage("Sign Up Failed");
-
 		}
 	}
 	
@@ -58,7 +49,6 @@ public class RegisterController implements BaseController {
 
 	@Override
 	public void updateView() {
-		
 	}
 
 	@Override
@@ -95,6 +85,17 @@ public class RegisterController implements BaseController {
 		}
 		return false;
 	}
+	
+	public void showMessage(String msg) {
+		registerView.showMessage(msg);
+	}
+	
+	public User getUser() {
+		return registerView.getUser();
+	}
+	
+	
+	
 	
 	private static RegisterController instance = new RegisterController();
 	

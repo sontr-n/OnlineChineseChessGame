@@ -2,6 +2,7 @@ package views;
 
 
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -11,11 +12,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.FlowLayout;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -23,9 +22,14 @@ import javax.swing.JTextArea;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
 
+import models.DataPackage;
 import models.User;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+
+import controllers.ActionType;
+import controllers.UserController;
+import controllers.networking.ClientController;
 
 public class HomeView extends JFrame {
 	private JSplitPane splitPane;
@@ -39,6 +43,8 @@ public class HomeView extends JFrame {
 	private JTextArea txtScore;
 	
 	public HomeView() {
+		this.setTitle("Home");
+		this.setResizable(false);
 		splitPane = new JSplitPane();
 		
 		topPanel = new JPanel(null);
@@ -99,10 +105,7 @@ public class HomeView extends JFrame {
 		 bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
 		 bottomPanel.add(scrollPane); 
 		 Object[] cols = {"Name", "Score", "Satus"};
-		 Object[][] rows = {
-				 {"name1", "0", "Playing"},
-				 {"name2", "0", "Free"}
-				 };
+		 Object[][] rows = {{}};
 		 TableModel tblModel = new DefaultTableModel(rows, cols) {
 			 public boolean isCellEditable(int row, int col) {
 				 return false;
@@ -114,6 +117,22 @@ public class HomeView extends JFrame {
 		 tblPlayer.getColumnModel().getColumn(2).setPreferredWidth(43);
 		 tblPlayer.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		 scrollPane.setViewportView(tblPlayer);
+		 tblPlayer.addMouseListener(new MouseAdapter() {
+			@Override
+		    public void mouseClicked(java.awt.event.MouseEvent evt) {
+		        int row = tblPlayer.rowAtPoint(evt.getPoint());
+		        int col = tblPlayer.columnAtPoint(evt.getPoint());
+		        if (row >= 0 && col == 0) {
+		        	String status = (String)tblPlayer.getValueAt(row, col+2);
+		        	if (status.equals("free")) {
+			        	User sender = UserController.getInstance().getUser();
+			        	String un = (String)tblPlayer.getValueAt(row, col);
+			        	User receiver = new User(un); 
+			        	ClientController.getInstance().sendData(new DataPackage(sender, receiver, ActionType.SEND_INVITATION));
+		        	}
+		        }
+		    }	
+		 });
 		 bottomPanel.add(scrollPane);
 	
 
@@ -126,6 +145,11 @@ public class HomeView extends JFrame {
 		});
 		
 	}
+
+	public JTable getTable() {
+		return tblPlayer;
+	}
+
 	
 	public void setUserInfo(User u) {
 		txtUsername.setText(u.getUsername());
@@ -139,4 +163,6 @@ public class HomeView extends JFrame {
 	public void addRankingListner(ActionListener r) {
 		btnSignOut.addActionListener(r);
 	}
+	
+
 }

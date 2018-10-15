@@ -1,4 +1,4 @@
-package controllers.Main;
+package controllers.main;
 
 import controllers.networking.ServerController;
 

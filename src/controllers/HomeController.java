@@ -2,13 +2,17 @@ package controllers;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
+import javax.swing.table.DefaultTableModel;
+
+import controllers.networking.ClientController;
 import models.DataPackage;
+import models.User;
 import views.HomeView;
 
 public class HomeController implements BaseController {
 	private HomeView homeView;
-	
 	
 	private HomeController() {
 		homeView = new HomeView();
@@ -21,6 +25,8 @@ public class HomeController implements BaseController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			UserController.getInstance().setLogedIn(false);
+			ClientController.getInstance().sendData(new DataPackage(UserController.getInstance().getUser(), ActionType.SIGN_OUT));
+			
 			hiddenView();
 			LoginController.getInstance().displayView();
 		}
@@ -36,6 +42,7 @@ public class HomeController implements BaseController {
 		
 	}
 	
+	
 	@Override
 	public void displayView() {
 		updateView();
@@ -45,18 +52,13 @@ public class HomeController implements BaseController {
 	@Override
 	public void updateView() {
 		infoUpdate();
-		tableUpdate();
 	}
 	
 	private void infoUpdate() {
 		homeView.setUserInfo(UserController.getInstance().getUser());
 	}
-	private void tableUpdate() {
-		
-	}
 	
 	
-
 
 	@Override
 	public DataPackage packData() {
@@ -68,10 +70,23 @@ public class HomeController implements BaseController {
 		homeView.dispose();
 	}
 	
+	public void updateTable(List<User> users) {
+		DefaultTableModel model = (DefaultTableModel)homeView.getTable().getModel();
+		int rows = model.getRowCount();
+		for (int i = rows-1; i >= 0; --i)
+			model.removeRow(i);
+		System.out.println("2");
+		for (User u : users) {
+			if (!u.getUsername().equals(UserController.getInstance().getUser().getUsername()))
+			model.addRow(u.toObject());
+		}
+	}
+	
 	private static HomeController instance = new HomeController();
 	
 	public static final HomeController getInstance() {
 		return instance;
 	}
+	
 
 }

@@ -14,7 +14,8 @@ public class User implements Serializable {
 	public User(String u, char[] p) {
 		this.username = u;
 		this.password = p;
-		isBusy = false;
+		isBusy = true;
+		score = 0;
 	}
 	
 	public User(int id, String u, char[] p, double s) {
@@ -22,11 +23,15 @@ public class User implements Serializable {
 		username = u;
 		password = p;
 		score = s;
+		isBusy = false;
 	}
 	
+
 	
-	public User() {
-		
+	public User(String u) {
+		username = u;
+		isBusy = false;
+		score = 0;
 	}
 	
 	public int getId() {
@@ -61,6 +66,13 @@ public class User implements Serializable {
 
 	public void setBusy(boolean isBusy) {
 		this.isBusy = isBusy;
+	}
+	
+	public String[] toObject() {
+		String busy = "busy";
+		if (!isBusy) busy = "free";
+		String[] s = {username, String.valueOf(score), busy};
+		return s;
 	}
 	
 	

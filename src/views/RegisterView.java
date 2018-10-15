@@ -28,7 +28,8 @@ public class RegisterView extends JFrame {
 	public RegisterView() {
 		JPanel content = new JPanel(null);
 		this.setBounds(100, 100, 460, 300);
-
+		this.setTitle("Sign up");
+		this.setResizable(false);
 		
 		JLabel lblUsername = new JLabel("Username: ");
 		lblUsername.setBounds(102, 80, 69, 16);

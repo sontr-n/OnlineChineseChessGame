@@ -5,12 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import controllers.ActionType;
-import controllers.HomeController;
-import controllers.LoginController;
-import controllers.UserController;
 import models.DataPackage;
-import models.User;
 import utils.ServerConfig;
 
 public class ClientController {
@@ -39,6 +34,7 @@ public class ClientController {
 			ex.printStackTrace();
 		}
 	}
+	
 	
 	
 	
