@@ -60,6 +60,14 @@ public class ClientController {
 		}
 	}	
 	
+	public void resetPipe() {
+		try {
+			oos.reset();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private static ClientController instance = new ClientController();
 	
 	public static final ClientController getInstance() {

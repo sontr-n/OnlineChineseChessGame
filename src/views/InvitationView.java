@@ -33,7 +33,7 @@ public class InvitationView extends JFrame {
 		txtInvite = new JTextField();
 		txtInvite.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		txtInvite.setEditable(false);
-		txtInvite.setText("Challenging you");
+		txtInvite.setText("Challenges you");
 		txtInvite.setBounds(157, 84, 137, 48);
 		content.add(txtInvite);
 		txtInvite.setBorder(BorderFactory.createEmptyBorder());

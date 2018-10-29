@@ -20,6 +20,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import models.DataPackage;
@@ -55,7 +56,6 @@ public class HomeView extends JFrame {
 		setPreferredSize(new Dimension(600, 500)); 
 		getContentPane().setLayout(new GridLayout());
 		getContentPane().add(splitPane);
-		setTitle("Login");
 		
 		//configure splitPane
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -124,11 +124,14 @@ public class HomeView extends JFrame {
 		        int col = tblPlayer.columnAtPoint(evt.getPoint());
 		        if (row >= 0 && col == 0) {
 		        	String status = (String)tblPlayer.getValueAt(row, col+2);
+		        	String un = (String)tblPlayer.getValueAt(row, col);
 		        	if (status.equals("free")) {
 			        	User sender = UserController.getInstance().getUser();
-			        	String un = (String)tblPlayer.getValueAt(row, col);
 			        	User receiver = new User(un); 
 			        	ClientController.getInstance().sendData(new DataPackage(sender, receiver, ActionType.SEND_INVITATION));
+		        	}
+		        	else {
+		        		showMessage(un + " is playing");
 		        	}
 		        }
 		    }	
@@ -163,6 +166,11 @@ public class HomeView extends JFrame {
 	public void addRankingListner(ActionListener r) {
 		btnSignOut.addActionListener(r);
 	}
+	
+	public void showMessage(String msg) {
+		JOptionPane.showMessageDialog(this, msg);
+	}
+	
 	
 
 }

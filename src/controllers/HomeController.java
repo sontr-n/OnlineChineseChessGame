@@ -4,9 +4,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 import controllers.networking.ClientController;
+import game.Game;
 import models.DataPackage;
 import models.User;
 import views.HomeView;
@@ -75,7 +77,6 @@ public class HomeController implements BaseController {
 		int rows = model.getRowCount();
 		for (int i = rows-1; i >= 0; --i)
 			model.removeRow(i);
-		System.out.println("2");
 		for (User u : users) {
 			if (!u.getUsername().equals(UserController.getInstance().getUser().getUsername()))
 			model.addRow(u.toObject());
@@ -86,6 +87,18 @@ public class HomeController implements BaseController {
 	
 	public static final HomeController getInstance() {
 		return instance;
+	}
+	
+	public void rejectedChallenge() {
+		homeView.showMessage("Your challenge was declined!");
+	}
+		
+	public void accecptedChallenge() {
+		homeView.showMessage("Your challenge was accepted!");
+		DataPackage dp = new DataPackage(UserController.getInstance().getUser(), 
+				PlayerController.getInstance().getUser(), ActionType.CHANGE_STATUS);
+		ClientController.getInstance().sendData(dp);
+		Game.getInstance().mf.reverseNewGame();
 	}
 	
 

@@ -5,10 +5,12 @@ import models.User;
 public class UserController {
 	private User user;
 	private boolean logedIn;
+	public boolean isTurn;
 	
 	private UserController() {
 		logedIn = false;
 		user = null;
+		isTurn = false;
 	}
 	
 	public User getUser() {

@@ -2,11 +2,16 @@ package controllers;
 
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import controllers.networking.ClientController;
+import game.Game;
 import models.DataPackage;
+import models.Destroy;
+import models.Movement;
 import models.User;
 
-public class ReceiveController extends Thread {
+public class ReceiveThreadAgent extends Thread {
 	List<User> users;
 	@Override
 	public void run() {
@@ -51,14 +56,35 @@ public class ReceiveController extends Thread {
 				inviteCtl.addSender(sender);
 			}
 			
-			if(dp.getActionType() == ActionType.RESPONSE_INVITATION) {
+			if (dp.getActionType() == ActionType.RESPONSE_INVITATION) {
 				User sender = dp.getSender();
 				boolean data = (Boolean)dp.getData();
-				System.out.println(data);
+				PlayerController.getInstance().setUser(sender);
 				//if accecpted
-				
+				if (data) {
+					HomeController.getInstance().accecptedChallenge();
+					HomeController.getInstance().hiddenView();
+				}
 				//if rejected
+				else 
+					HomeController.getInstance().rejectedChallenge();
+					
 			}
+			
+			if (dp.getActionType() == ActionType.NEW_GAME) {
+				
+			}
+			
+			if (dp.getActionType() == ActionType.MOVE) {
+				Movement mov = (Movement)dp.getData();
+				Game.getInstance().mf.getMove(mov.chessIndex, mov.transportX, mov.transportY);
+			}
+			
+			if (dp.getActionType() == ActionType.DESTROY) {
+				Destroy des = (Destroy)dp.getData();
+				Game.getInstance().mf.getDestroy(des.hitChess, des.destroyedChess);
+			}
+			
 		}
 	}
 }

@@ -28,7 +28,7 @@ public class LoginView extends JFrame {
 		JPanel content = new JPanel(null);
 		this.setBounds(100, 100, 460, 300);
 		this.setResizable(false);
-		this.setTitle("Login in");
+		this.setTitle("Log in");
 		
 		JLabel lblUsername = new JLabel("Username: ");
 		lblUsername.setBounds(102, 80, 69, 16);

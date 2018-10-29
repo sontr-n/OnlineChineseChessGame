@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import controllers.networking.ClientController;
+import game.Game;
 import models.DataPackage;
 import models.User;
 import views.InvitationView;
@@ -27,6 +28,9 @@ public class InvitationController {
 		public void actionPerformed(ActionEvent e) {
 			ClientController.getInstance().sendData(new DataPackage(new Boolean(true), sender, receiver, ActionType.RESPONSE_INVITATION));
 			view.dispose();
+			HomeController.getInstance().hiddenView();
+			Game.getInstance().mf.isMaster = true;
+			Game.getInstance().mf.normalNewGame();
 		}
 		
 	}

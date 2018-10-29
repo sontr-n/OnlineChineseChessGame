@@ -1,7 +1,6 @@
 package models;
 
 import java.io.Serializable;
-import java.net.Socket;
 
 public class User implements Serializable {
 	private String username;
@@ -14,7 +13,7 @@ public class User implements Serializable {
 	public User(String u, char[] p) {
 		this.username = u;
 		this.password = p;
-		isBusy = true;
+		isBusy = false;
 		score = 0;
 	}
 	

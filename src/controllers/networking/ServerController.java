@@ -14,6 +14,7 @@ import controllers.ActionType;
 import controllers.LoginController;
 import controllers.RegisterController;
 import models.DataPackage;
+import models.Movement;
 import models.User;
 import utils.ServerConfig;
 import models.Client;
@@ -61,6 +62,11 @@ public class ServerController {
 		public Handler(Socket s) {
 			socket = s;
 		}
+		
+		@Override
+		public void run() {
+			listening();
+		}
 
 		public void listening() {
 			try {
@@ -88,6 +94,22 @@ public class ServerController {
 						
 						if (dp.getActionType() == ActionType.SEND_INVITATION) {
 							handleRequestInvitation(dp);
+						}
+						
+						if (dp.getActionType() == ActionType.CHANGE_STATUS) {
+							handleChangeStatus(dp);
+						}
+						
+						if (dp.getActionType() == ActionType.NEW_GAME) {
+							handleNewGame(dp);
+						}
+						
+						if (dp.getActionType() == ActionType.MOVE) {
+							handleMovement(dp);
+						}
+						
+						if (dp.getActionType() == ActionType.DESTROY) {
+							handleDestruction(dp);
 						}
 						
 						
@@ -147,11 +169,27 @@ public class ServerController {
 			}
 		}
 		
+		private void handleMovement(DataPackage dp) {
+			User receiver = dp.getReceiver();
+			Object data = dp.getData();
+			Iterator<Client> iter = clients.iterator();
+			while (iter.hasNext()) {
+				Client c = iter.next();
+				if (c.getUser().getUsername().equals(receiver.getUsername())) {
+					try {
+						c.getStream().reset();
+						c.getStream().writeObject(new DataPackage(data, ActionType.MOVE));
+					} catch (IOException ex) {
+						System.err.println(ex);
+					}
+				}
+			}
+		}
 		
 		private void handleResponseInvitation(DataPackage dp) {
 			User sender = dp.getSender();
 			User receiver = dp.getReceiver();
-			boolean data = (Boolean)dp.getData();
+			Object data = dp.getData();
 			Iterator<Client> iter = clients.iterator();
 			while (iter.hasNext()) {
 				Client c = iter.next();
@@ -184,6 +222,40 @@ public class ServerController {
 			}
 		}
 		
+		private void handleDestruction(DataPackage dp) {
+			User receiver = dp.getReceiver();
+			Object data = dp.getData();
+			Iterator<Client> iter = clients.iterator();
+			while (iter.hasNext()) {
+				Client c = iter.next();
+				if (c.getUser().getUsername().equals(receiver.getUsername())) {
+					try {
+						c.getStream().reset();
+						c.getStream().writeObject(new DataPackage(data, ActionType.DESTROY));
+					} catch (IOException ex) {
+						System.err.println(ex);
+					}
+				}
+			}
+		}
+		
+		private void handleChangeStatus(DataPackage dp) {
+			User u_1 = dp.getSender();
+			User u_2 = dp.getReceiver();
+			for (User user : users) {
+				if (u_1.getUsername().equals(user.getUsername())) 
+					user.setBusy(!user.isBusy());
+				if (u_2.getUsername().equals(user.getUsername())) 
+					user.setBusy(!user.isBusy());
+			}
+			handleUpdateTable();
+
+		}
+		
+		private void handleNewGame(DataPackage dp) {
+			
+		}
+		
 		
 		//updating table when someone change 
 		private synchronized void handleUpdateTable() {
@@ -210,11 +282,8 @@ public class ServerController {
 			removeUser(u.getUsername());
 			handleUpdateTable();
 		}
-	
-		@Override
-		public void run() {
-			listening();
-		}
+		
+		
 		
 		private synchronized void removeClient(ObjectOutputStream oos) {
 			Iterator<Client> iter = clients.iterator();
@@ -226,6 +295,8 @@ public class ServerController {
 				}
 			}
 		}
+		
+		
 		
 		private synchronized void addUser(User u, ObjectOutputStream oos) {
 			Iterator<Client> iter = clients.iterator();
