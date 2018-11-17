@@ -1,4 +1,4 @@
-package controllers.networking;
+package controllers.networking.server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -65,6 +65,7 @@ public class ServerController {
 		
 		@Override
 		public void run() {
+			this.setPriority(NORM_PRIORITY);
 			listening();
 		}
 
@@ -72,10 +73,10 @@ public class ServerController {
 			try {
 				ois = new ObjectInputStream(socket.getInputStream());
 				oos = new ObjectOutputStream(socket.getOutputStream());
-				clients.add(new Client(null, oos));
+				clients.add(new Client(null, oos, ois));
 				for (;;) {
 					try {
-						DataPackage dp = (DataPackage)ois.readObject();
+						DataPackage dp = (DataPackage) ois.readObject();
 						if (dp.getActionType() == ActionType.SIGN_IN) {
 							handleSignIn(dp);
 						}
@@ -100,8 +101,8 @@ public class ServerController {
 							handleChangeStatus(dp);
 						}
 						
-						if (dp.getActionType() == ActionType.NEW_GAME) {
-							handleNewGame(dp);
+						if (dp.getActionType() == ActionType.REMATCH) {
+							handleRematch(dp);
 						}
 						
 						if (dp.getActionType() == ActionType.MOVE) {
@@ -112,9 +113,13 @@ public class ServerController {
 							handleDestruction(dp);
 						}
 						
+						if (dp.getActionType() == ActionType.EXIT) {
+							handleExit(dp);
+						}
 						
-		//				} catch (ClassNotFoundException ex) {
-		//					ex.printStackTrace();
+						
+						} catch (ClassNotFoundException ex) {
+							ex.printStackTrace();
 					} catch (Exception ex) {
 						System.err.println(ex);
 						removeClient(oos);
@@ -148,10 +153,8 @@ public class ServerController {
 			}
 		}
 		
-		//
+		
 		private synchronized void handleSignIn(DataPackage dp) {
-			System.out.println(clients.size());
-			System.out.println("sign in");
 			User u = (User)dp.getData();
 			try {
 				DataPackage re = LoginController.getInstance().getUserDAO(u);
@@ -177,8 +180,8 @@ public class ServerController {
 				Client c = iter.next();
 				if (c.getUser().getUsername().equals(receiver.getUsername())) {
 					try {
-						c.getStream().reset();
-						c.getStream().writeObject(new DataPackage(data, ActionType.MOVE));
+						c.getOutputStream().reset();
+						c.getOutputStream().writeObject(new DataPackage(data, ActionType.MOVE));
 					} catch (IOException ex) {
 						System.err.println(ex);
 					}
@@ -186,17 +189,41 @@ public class ServerController {
 			}
 		}
 		
+		public void handleExit(DataPackage dp) {
+			User receiver = dp.getReceiver();
+			User sender = dp.getSender();
+			Iterator<Client> iter1 = clients.iterator();
+			Iterator<User> iter2 = users.iterator();
+			try {
+				while (iter1.hasNext()) {
+					Client c = iter1.next();
+					if (c.getUser().getUsername().equals(receiver.getUsername())) {
+							c.getOutputStream().reset();
+							c.getOutputStream().writeObject(dp);		
+					}
+				}
+				while (iter2.hasNext()) {
+					User u = iter2.next();
+					if (u.getUsername().equals(receiver.getUsername()) || u.getUsername().equals(sender.getUsername()))
+						u.setBusy(false);
+				}
+				handleUpdateTable();
+			} catch (IOException ex) {
+				System.err.println(ex);	
+			}
+		}
+		
 		private void handleResponseInvitation(DataPackage dp) {
 			User sender = dp.getSender();
 			User receiver = dp.getReceiver();
-			Object data = dp.getData();
+			Boolean data = (Boolean) dp.getData();
 			Iterator<Client> iter = clients.iterator();
 			while (iter.hasNext()) {
 				Client c = iter.next();
 				if (c.getUser().getUsername().equals(receiver.getUsername())) {
 					try {
-						c.getStream().reset();
-						c.getStream().writeObject(new DataPackage(data, sender, receiver, ActionType.RESPONSE_INVITATION));
+						c.getOutputStream().reset();
+						c.getOutputStream().writeObject(new DataPackage(data, sender, receiver, ActionType.RESPONSE_INVITATION));
 					} catch (IOException ex) {
 						System.err.println(ex);
 					}
@@ -213,8 +240,8 @@ public class ServerController {
 				Client c = iter.next();
 				if (c.getUser().getUsername().equals(receiver.getUsername())) {
 					try {
-						c.getStream().reset();
-						c.getStream().writeObject(new DataPackage(sender, receiver, ActionType.SEND_INVITATION));
+						c.getOutputStream().reset();
+						c.getOutputStream().writeObject(new DataPackage(sender, receiver, ActionType.SEND_INVITATION));
 					} catch (IOException ex) {
 						System.err.println(ex);
 					}
@@ -230,8 +257,8 @@ public class ServerController {
 				Client c = iter.next();
 				if (c.getUser().getUsername().equals(receiver.getUsername())) {
 					try {
-						c.getStream().reset();
-						c.getStream().writeObject(new DataPackage(data, ActionType.DESTROY));
+						c.getOutputStream().reset();
+						c.getOutputStream().writeObject(new DataPackage(data, ActionType.DESTROY));
 					} catch (IOException ex) {
 						System.err.println(ex);
 					}
@@ -252,7 +279,7 @@ public class ServerController {
 
 		}
 		
-		private void handleNewGame(DataPackage dp) {
+		private void handleRematch(DataPackage dp) {
 			
 		}
 		
@@ -268,8 +295,8 @@ public class ServerController {
 			try {
 				DataPackage dp = new DataPackage(users, ActionType.UPDATE);
 				for (Client c : clients) {
-					c.getStream().reset();
-					c.getStream().writeObject(dp);
+					c.getOutputStream().reset();
+					c.getOutputStream().writeObject(dp);
 				}
 			} catch (IOException ex) {
 				System.err.println(ex);
@@ -290,7 +317,7 @@ public class ServerController {
 			
 			while (iter.hasNext()) {
 				Client c = iter.next();
-				if (c.getStream().equals(oos)) {
+				if (c.getOutputStream().equals(oos)) {
 					iter.remove();
 				}
 			}
@@ -303,7 +330,7 @@ public class ServerController {
 			
 			while (iter.hasNext()) {
 				Client c = iter.next();
-				if (c.getStream().equals(oos)) {
+				if (c.getOutputStream().equals(oos)) {
 					c.setUser(u);
 				}
 			}

@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 
 public class LoginView extends JFrame {
+	private static final long serialVersionUID = 1L;
 	private User user;
 	private JTextField txtUsername;
 	private JPasswordField txtPassword;

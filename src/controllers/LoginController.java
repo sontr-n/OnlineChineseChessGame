@@ -7,8 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-
-import controllers.networking.ClientController;
+import controllers.networking.client.ClientController;
 import models.DataPackage;
 import models.User;
 import views.LoginView;
@@ -61,11 +60,11 @@ public class LoginController implements BaseController {
 	public DataPackage getUserDAO(User u) {
 		//get user data from DB and check 
 		DAO dao = new DAO();
-		Connection con = dao.connect();
 		DataPackage dp = null;
 		try {
-			Statement stm = con.createStatement();
-			ResultSet rs = stm.executeQuery("SELECT * FROM users WHERE username='" + u.getUsername() + "' AND password='" + String.valueOf(u.getPassword()) + "'");
+			String sql = "SELECT * FROM users WHERE username=? AND password=?";
+			Object[] params = new Object[] {u.getUsername(), u.getPassword()};
+			ResultSet rs = dao.executeQuery(sql, params);
 			if (rs.first())	
 				dp = new DataPackage(u, ActionType.SIGN_IN);
 		} catch (SQLException ex) {

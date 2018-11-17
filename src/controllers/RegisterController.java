@@ -4,10 +4,12 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.swing.JOptionPane;
+
+import controllers.networking.client.ClientController;
 
 import java.sql.PreparedStatement;
 
-import controllers.networking.ClientController;
 import models.DataPackage;
 import models.User;
 import views.HomeView;
@@ -29,7 +31,12 @@ public class RegisterController implements BaseController {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			ClientController.getInstance().sendData(new DataPackage(registerView.getUser(), ActionType.SIGN_UP));
+			String pass = String.valueOf(registerView.getTxtPassword().getPassword());
+			String rePass = String.valueOf(registerView.getTxtConfirmedPassword().getPassword());
+			if (pass.equals(rePass))
+				ClientController.getInstance().sendData(new DataPackage(registerView.getUser(), ActionType.SIGN_UP));
+			else 
+				JOptionPane.showMessageDialog(registerView, "Password and Confirmed password didn't match");
 		}
 	}
 	
@@ -69,17 +76,12 @@ public class RegisterController implements BaseController {
 	public boolean addUser(User u) {
 		//connect DB
 		DAO dao = new DAO();
-		Connection con = dao.connect();
-		try {
-			PreparedStatement pstm = con.prepareStatement("INSERT INTO users (username, password) values (?, ?)"); 
-			pstm.setString(1, u.getUsername());
-			pstm.setString(2, String.valueOf(u.getPassword()));
-			int count = pstm.executeUpdate();
-			if (count > 0)
-				return true;
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
+		String sql = "INSERT INTO users (username, password) values (?, ?)";
+		Object[] params = new Object[] {u.getUsername(), u.getPassword()};
+		int count = dao.executeUpdate(sql, params);
+		dao.closeConnection();
+		if (count > 0)
+			return true;
 		return false;
 	}
 	

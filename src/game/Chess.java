@@ -95,14 +95,11 @@ public class Chess extends JLabel{
 		this.url = new String("images/" + name);
 		int id = name.indexOf('-');
 		this.rank = new String(name.substring(id+1,name.length()-4));
-		System.out.println("url is:" + url);
-		System.out.println("name is:" + name);
 		this.setIcon(new ImageIcon(url));
         this.setSize(55, 55);
         this.setLocation(location);
         this.setVisible(true);
         this.addMouseListener(new Moniter());
-        System.out.println("chess has been initilized");
 	}
 	
 	// Convert the matrix index to the real pixels

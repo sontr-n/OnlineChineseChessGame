@@ -1,6 +1,6 @@
 package controllers.main;
 
-import controllers.networking.ServerController;
+import controllers.networking.server.ServerController;
 
 public class ServerRun {
 	public static void main(String[] args) {

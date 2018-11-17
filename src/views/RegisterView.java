@@ -1,11 +1,8 @@
 package views;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.EventListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -14,16 +11,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 
 import models.User;
 
 public class RegisterView extends JFrame {
-	private User user;
+	private static final long serialVersionUID = 1L;
 	private JTextField txtUsername;
 	private JPasswordField txtPassword;
 	private JButton btnRegister;
 	private JButton btnReturn;
+	private JPasswordField txtConfirmedPassword;
 	
 	public RegisterView() {
 		JPanel content = new JPanel(null);
@@ -45,21 +42,30 @@ public class RegisterView extends JFrame {
 		content.add(lblPassword);
 		
 		txtPassword = new JPasswordField();
-		txtPassword.setEchoChar('*');
 		txtPassword.setBounds(183, 119, 116, 22);
 		content.add(txtPassword);
 		txtPassword.setColumns(10);
 		
 		
 		btnRegister = new JButton("Register");
-		btnRegister.setBounds(101, 182, 97, 25);
+		btnRegister.setBounds(110, 212, 97, 25);
 		content.add(btnRegister);
 		
 		btnReturn = new JButton("Return");
-		btnReturn.setBounds(221, 182, 97, 25);
+		btnReturn.setBounds(244, 212, 97, 25);
 		content.add(btnReturn);
 		
+		JLabel lblRepassword = new JLabel("Confirmed password:");
+		lblRepassword.setBounds(38, 159, 123, 16);
+		content.add(lblRepassword);
+		
+		txtConfirmedPassword = new JPasswordField();
+		txtConfirmedPassword.setBounds(183, 156, 116, 22);
+		content.add(txtConfirmedPassword);
+		txtConfirmedPassword.setColumns(10);
+		
 		this.setContentPane(content);
+		
 		
 		
 		//click exit window
@@ -70,6 +76,23 @@ public class RegisterView extends JFrame {
 		});
 	}
 	
+	
+	
+	
+	public JPasswordField getTxtPassword() {
+		return txtPassword;
+	}
+
+
+
+
+	public JPasswordField getTxtConfirmedPassword() {
+		return txtConfirmedPassword;
+	}
+
+
+
+
 	public User getUser() {
 		return new User(txtUsername.getText(), txtPassword.getPassword());
 	}

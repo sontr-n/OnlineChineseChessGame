@@ -1,14 +1,17 @@
 package models;
 
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class Client {
 	private User user;
 	private ObjectOutputStream oos;
+	private ObjectInputStream ois;
 	
-	public Client(User u, ObjectOutputStream o) {
+	public Client(User u, ObjectOutputStream o, ObjectInputStream i) {
 		user = u;
 		oos = o;
+		ois = i;
 	}
 
 	public User getUser() {
@@ -19,12 +22,12 @@ public class Client {
 		this.user = user;
 	}
 
-	public ObjectOutputStream getStream() {
+	public ObjectOutputStream getOutputStream() {
 		return oos;
 	}
 
-	public void setStream(ObjectOutputStream oos) {
-		this.oos = oos;
+	public ObjectInputStream getInputStream() {
+		return ois;
 	}
 	
 	

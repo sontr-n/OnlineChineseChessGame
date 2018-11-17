@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import controllers.networking.ClientController;
-import game.Game;
+import controllers.networking.client.ClientController;
+import game.GameController;
 import models.DataPackage;
 import models.Destroy;
 import models.Movement;
@@ -70,20 +70,30 @@ public class ReceiveThreadAgent extends Thread {
 					HomeController.getInstance().rejectedChallenge();
 					
 			}
-			
-			if (dp.getActionType() == ActionType.NEW_GAME) {
+			if (dp.getActionType() == ActionType.REMATCH) {
 				
 			}
 			
 			if (dp.getActionType() == ActionType.MOVE) {
 				Movement mov = (Movement)dp.getData();
-				Game.getInstance().mf.getMove(mov.chessIndex, mov.transportX, mov.transportY);
+				GameController.getInstance().mf.getMove(mov.chessIndex, mov.transportX, mov.transportY);
 			}
 			
 			if (dp.getActionType() == ActionType.DESTROY) {
 				Destroy des = (Destroy)dp.getData();
-				Game.getInstance().mf.getDestroy(des.hitChess, des.destroyedChess);
+				GameController.getInstance().mf.getDestroy(des.hitChess, des.destroyedChess);
 			}
+			
+			if (dp.getActionType() == ActionType.EXIT) {
+				String name = PlayerController.getInstance().getUser().getUsername();
+				GameController.getInstance().mf.stopTime();
+				JOptionPane.showMessageDialog(GameController.getInstance().mf, name + " had quited, You won!");
+				GameController.getInstance().quit();
+				HomeController.getInstance().displayView();
+			}
+			
+			
+			
 			
 		}
 	}

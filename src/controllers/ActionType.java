@@ -1,7 +1,7 @@
 package controllers;
 
 public enum ActionType {
-	SIGN_IN,
+	SIGN_IN, 
 	SIGN_UP,
 	PLAY,
 	SIGN_OUT,
@@ -9,7 +9,8 @@ public enum ActionType {
 	SEND_INVITATION,
 	RESPONSE_INVITATION,
 	CHANGE_STATUS,
-	NEW_GAME,
+	REMATCH,
 	MOVE,
-	DESTROY
+	DESTROY,
+	EXIT,
 }

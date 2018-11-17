@@ -188,7 +188,6 @@ public class ChessGroup implements Serializable {
 				
 			}
 		}
-		System.out.println("index is:" + index);
 	}
 	
 	public ArrayList<Chess> getChess(){

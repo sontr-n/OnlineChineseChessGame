@@ -3,6 +3,7 @@ package models;
 import java.io.Serializable;
 
 public class User implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private String username;
 	private char[] password;
 	private double score;
@@ -44,8 +45,8 @@ public class User implements Serializable {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	public char[] getPassword() {
-		return password;
+	public String getPassword() {
+		return String.valueOf(password);
 	}
 	public void setPassword(char[] password) {
 		this.password = password;

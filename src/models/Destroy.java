@@ -2,10 +2,10 @@ package models;
 
 import java.io.Serializable;
 
-import game.ChessGroup;
 
 public class Destroy implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	public int hitChess;
 	public int destroyedChess;
 	

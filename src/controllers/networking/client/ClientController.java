@@ -1,4 +1,4 @@
-package controllers.networking;
+package controllers.networking.client;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
