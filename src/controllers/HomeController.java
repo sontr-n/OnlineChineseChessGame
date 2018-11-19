@@ -9,7 +9,6 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 import controllers.networking.client.ClientController;
-import game.GameController;
 import models.DataPackage;
 import models.User;
 import views.HomeView;
@@ -72,12 +71,8 @@ public class HomeController implements BaseController {
 		        	User receiver = new User(user.getUsername()); 
 		        	ClientController.getInstance().sendData(new DataPackage(sender, receiver, ActionType.SEND_INVITATION));
 				}
-			
-			}
-			
-			
+			}			
 		}
-		
 	}
 	
 	
@@ -142,8 +137,6 @@ public class HomeController implements BaseController {
 		DataPackage dp = new DataPackage(UserController.getInstance().getUser(), 
 				PlayerController.getInstance().getUser(), ActionType.CHANGE_STATUS);
 		ClientController.getInstance().sendData(dp);
-		GameController.getInstance().newGame();
-		GameController.getInstance().mf.reverseNewGame();
 	}
 	
 

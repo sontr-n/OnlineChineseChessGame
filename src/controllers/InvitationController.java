@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 
 import controllers.networking.client.ClientController;
-import game.GameController;
 import models.DataPackage;
 import models.User;
 import views.InvitationView;
@@ -30,12 +29,8 @@ public class InvitationController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			isPicked = true;
-			ClientController.getInstance().sendData(new DataPackage(new Boolean(true), sender, receiver, ActionType.RESPONSE_INVITATION));
+			ClientController.getInstance().sendData(new DataPackage(true, sender, receiver, ActionType.RESPONSE_INVITATION));
 			view.dispose();
-			HomeController.getInstance().hiddenView();
-			GameController.getInstance().newGame();
-			GameController.getInstance().mf.isMaster = true;
-			GameController.getInstance().mf.normalNewGame();
 		}
 		
 	}

@@ -105,6 +105,7 @@ public class MainFrame extends JFrame {
 		@Override
 		public void run() {
 			runTimer();
+			this.setDaemon(true);
 		}
 		
 		public void runTimer() {
@@ -873,19 +874,25 @@ public class MainFrame extends JFrame {
 			//If one of the chess group die, then the game is over
 			if ((!this.cg1.isAlive()) || (!this.cg2.isAlive())) {
 				isOver = true;//game over
+				stopTime();
 				//If the red chess died, then a message dialog will jump out to show us the red loses, and game is over 
 				if (!this.cg1.isAlive()) {
 					if (isMaster) 
-						JOptionPane.showMessageDialog(null, "YOU WON!", "Game Over!", -1);		
+						JOptionPane.showMessageDialog(null, "Congats, You Won!", "Game Over!", -1);		
 					else 
-						JOptionPane.showMessageDialog(null, "YOU LOSE!", "Game Over!", -1);
+						JOptionPane.showMessageDialog(null, "Unfortunately ,You Lose!", "Game Over!", -1);
 				 } 
 				 else{//If the black chess died, then a message dialog will jump out to show us the black loses, and game is over 
 					 if (isMaster) 
-						JOptionPane.showMessageDialog(null, "YOU WON!", "Game Over!", -1);		
+						 JOptionPane.showMessageDialog(null, "Congats, You Won!", "Game Over!", -1);		
 					else 
-						JOptionPane.showMessageDialog(null, "YOU LOSE!", "Game Over!", -1);
+						JOptionPane.showMessageDialog(null, "Unfortunately ,You Lose!", "Game Over!", -1);
 				 }	
+				int option = JOptionPane.showConfirmDialog(null, "Do you want to rematch?", "Rematch", JOptionPane.YES_NO_OPTION);
+//				if (option == JOptionPane.YES_OPTION) 
+//					ClientController.getInstance().sendData(new DataPackage(true, ActionType.REMATCH));
+//				else 
+//					ClientController.getInstance().sendData(new DataPackage(false, ActionType.REMATCH));
 			 }
 				
 			 try{//check the sentence
@@ -996,6 +1003,7 @@ public class MainFrame extends JFrame {
 		// write your code here!
 		//If one of the chess group die, then the game is over
 		if ((!red.isAlive()) || (!black.isAlive())) {
+			stopTime();
 			isOver = true;//game over
 			//If the red chess died, then a message dialog will jump out to show us the red loses, and game is over 
 			if (!red.isAlive()) {
@@ -1010,6 +1018,11 @@ public class MainFrame extends JFrame {
 				else 
 					JOptionPane.showMessageDialog(this, "Unfortunately ,You Lose!", "Game Over!", -1);
 			}
+			int option = JOptionPane.showConfirmDialog(null, "Do you want to rematch?", "Rematch", JOptionPane.YES_NO_OPTION);
+//			if (option == JOptionPane.YES_OPTION) 
+//				ClientController.getInstance().sendData(new DataPackage(true, ActionType.REMATCH));
+//			else 
+//				ClientController.getInstance().sendData(new DataPackage(false, ActionType.REMATCH));
 		 }
 	}
 	

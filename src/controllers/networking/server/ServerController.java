@@ -14,6 +14,7 @@ import controllers.ActionType;
 import controllers.LoginController;
 import controllers.RegisterController;
 import models.DataPackage;
+import models.Game;
 import models.Movement;
 import models.User;
 import utils.ServerConfig;
@@ -26,6 +27,7 @@ public class ServerController {
 //	private HashSet<ObjectOutputStream> players = new HashSet<ObjectOutputStream>();
 	private List<Client> clients = Collections.synchronizedList(new ArrayList<Client>());
 	private List<User> users = Collections.synchronizedList(new ArrayList<User>());
+	private List<Game> games = Collections.synchronizedList(new ArrayList<Game>());
 	
 	public ServerController() {
 		open();
@@ -65,7 +67,7 @@ public class ServerController {
 		
 		@Override
 		public void run() {
-			this.setPriority(NORM_PRIORITY);
+			
 			listening();
 		}
 
@@ -97,13 +99,11 @@ public class ServerController {
 							handleRequestInvitation(dp);
 						}
 						
+
 						if (dp.getActionType() == ActionType.CHANGE_STATUS) {
 							handleChangeStatus(dp);
 						}
 						
-						if (dp.getActionType() == ActionType.REMATCH) {
-							handleRematch(dp);
-						}
 						
 						if (dp.getActionType() == ActionType.MOVE) {
 							handleMovement(dp);
@@ -116,6 +116,7 @@ public class ServerController {
 						if (dp.getActionType() == ActionType.EXIT) {
 							handleExit(dp);
 						}
+						
 						
 						
 						} catch (ClassNotFoundException ex) {
@@ -173,6 +174,7 @@ public class ServerController {
 		}
 		
 		private void handleMovement(DataPackage dp) {
+			System.out.println("test");
 			User receiver = dp.getReceiver();
 			Object data = dp.getData();
 			Iterator<Client> iter = clients.iterator();
@@ -218,17 +220,21 @@ public class ServerController {
 			User receiver = dp.getReceiver();
 			Boolean data = (Boolean) dp.getData();
 			Iterator<Client> iter = clients.iterator();
-			while (iter.hasNext()) {
-				Client c = iter.next();
-				if (c.getUser().getUsername().equals(receiver.getUsername())) {
-					try {
-						c.getOutputStream().reset();
-						c.getOutputStream().writeObject(new DataPackage(data, sender, receiver, ActionType.RESPONSE_INVITATION));
-					} catch (IOException ex) {
-						System.err.println(ex);
+			if (!data)
+				while (iter.hasNext()) {
+					Client c = iter.next();
+					if (c.getUser().getUsername().equals(receiver.getUsername())) {
+						try {
+							c.getOutputStream().reset();
+							c.getOutputStream().writeObject(new DataPackage(data, ActionType.RESPONSE_INVITATION));
+						} catch (IOException ex) {
+							System.err.println(ex);
+						}
 					}
 				}
-			}
+			else 
+				handleNewGame(dp);
+				
 		}
 		
 		private void handleRequestInvitation(DataPackage dp) {
@@ -276,10 +282,26 @@ public class ServerController {
 					user.setBusy(!user.isBusy());
 			}
 			handleUpdateTable();
-
 		}
 		
-		private void handleRematch(DataPackage dp) {
+		private void handleNewGame(DataPackage dp) {
+			User sender = dp.getSender();
+			User receiver = dp.getReceiver();
+			Iterator<Client> iter = clients.iterator();
+			Game game = new Game(sender, receiver);
+			games.add(game);
+			while (iter.hasNext()) {
+				Client c = iter.next();
+				if (c.getUser().getUsername().equals(receiver.getUsername()) || 
+						c.getUser().getUsername().equals(sender.getUsername())) {
+					try {
+						c.getOutputStream().reset();
+						c.getOutputStream().writeObject(new DataPackage(game, ActionType.NEW_GAME));
+					} catch (IOException ex) {
+						System.err.println(ex);
+					}
+				}
+			}
 			
 		}
 		

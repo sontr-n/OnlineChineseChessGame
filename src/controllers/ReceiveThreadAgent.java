@@ -5,9 +5,9 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import controllers.networking.client.ClientController;
-import game.GameController;
 import models.DataPackage;
 import models.Destroy;
+import models.Game;
 import models.Movement;
 import models.User;
 
@@ -56,24 +56,29 @@ public class ReceiveThreadAgent extends Thread {
 				inviteCtl.addSender(sender);
 			}
 			
-			if (dp.getActionType() == ActionType.RESPONSE_INVITATION) {
-				User sender = dp.getSender();
-				boolean data = (Boolean)dp.getData();
-				PlayerController.getInstance().setUser(sender);
-				//if accecpted
-				if (data) {
-					HomeController.getInstance().accecptedChallenge();
-					HomeController.getInstance().hiddenView();
-				}
-				//if rejected
-				else 
-					HomeController.getInstance().rejectedChallenge();
+			if (dp.getActionType() == ActionType.RESPONSE_INVITATION) 
+				HomeController.getInstance().rejectedChallenge();
+			
+			
+			if (dp.getActionType() == ActionType.NEW_GAME) {
+				Game game = (Game) dp.getData();
+				GameController.getInstance().newGame(game);
+				
+				HomeController.getInstance().hiddenView();
+				if (UserController.getInstance().getUser().getUsername().equals(game.getPlayer1().getUsername())) {
+					GameController.getInstance().mf.isMaster = false;
+					GameController.getInstance().mf.reverseNewGame();
+					PlayerController.getInstance().setUser(game.getPlayer2());
 					
-			}
-			if (dp.getActionType() == ActionType.REMATCH) {
+				}
+				else {
+					GameController.getInstance().mf.isMaster = true;
+					GameController.getInstance().mf.normalNewGame();
+					PlayerController.getInstance().setUser(game.getPlayer1());
+				}
 				
 			}
-			
+				
 			if (dp.getActionType() == ActionType.MOVE) {
 				Movement mov = (Movement)dp.getData();
 				GameController.getInstance().mf.getMove(mov.chessIndex, mov.transportX, mov.transportY);

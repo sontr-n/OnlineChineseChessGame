@@ -239,7 +239,7 @@ public class Chess extends JLabel{
 			if(!MainFrame.getIsOver()){
 				Chess c = (Chess)e.getSource();
 				c.isChosen = true;
-				new Blink(c);
+				new Blink(c).start();
 			}
 		}
 
@@ -251,11 +251,11 @@ public class Chess extends JLabel{
 	 * @author Louis
 	 *
 	 */
-	class Blink implements Runnable{
+	class Blink extends Thread {
 		Chess c = null;
 		public Blink(Chess c){
 			this.c = c;
-			(new Thread(this)).start();
+			this.setDaemon(true);
 		}
 		@Override
 		public void run() {
