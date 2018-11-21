@@ -806,7 +806,7 @@ public class MainFrame extends JFrame {
 					else{
 						ChessRule.AllRules(cb, r, x, y);
 					}
-					
+
 					// 3.3. after eating chess, you should do some clean up work
 					//3.3.1 remove the eaten chess from the chess board
 					//3.3.2 change the value of "RedPlay" to indicate the other side is going to move now
