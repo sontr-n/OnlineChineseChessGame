@@ -7,10 +7,56 @@ public class User implements Serializable {
 	private String username;
 	private char[] password;
 	private double score;
+	private int moveWin;
+	private int moveLose;
+	private int gameWin;
+	private int gameLose;
+	private int gameDraw;
+	
+	
+	public int getGameWin() {
+		return gameWin;
+	}
+
+	public int getGameLose() {
+		return gameLose;
+	}
+
+	public int getGameDraw() {
+		return gameDraw;
+	}
+
+	public void setGameWin(int gameWin) {
+		this.gameWin = gameWin;
+	}
+
+	public void setGameLose(int gameLose) {
+		this.gameLose = gameLose;
+	}
+
+	public void setGameDraw(int gameDraw) {
+		this.gameDraw = gameDraw;
+	}
+
+	public int getMoveWin() {
+		return moveWin;
+	}
+
+	public int getMoveLose() {
+		return moveLose;
+	}
+
+	public void setMoveWin(int moveWin) {
+		this.moveWin = moveWin;
+	}
+
+	public void setMoveLose(int moveLose) {
+		this.moveLose = moveLose;
+	}
+
 	private int id;
 	private boolean isBusy;
-	
-	
+
 	public User(String u, char[] p) {
 		this.username = u;
 		this.password = p;
@@ -53,6 +99,7 @@ public class User implements Serializable {
 	}
 
 	public double getScore() {
+		score = gameWin + gameDraw/2;
 		return score;
 	}
 
@@ -63,6 +110,17 @@ public class User implements Serializable {
 	public boolean isBusy() {
 		return isBusy;
 	}
+	
+	public double getAverageMoveWin() {
+		if (gameWin == 0) return 0;
+		return Math.round(((double)moveWin) / gameWin);
+	}
+	
+	public double getAverageMoveLose() {
+		if (gameLose == 0) return 0;
+		return ((double)moveLose) / gameLose;
+	}
+	
 
 	public void setBusy(boolean isBusy) {
 		this.isBusy = isBusy;
@@ -71,8 +129,12 @@ public class User implements Serializable {
 	public String[] toObject() {
 		String busy = "busy";
 		if (!isBusy) busy = "free";
-		String[] s = {username, String.valueOf(score), busy};
+		String[] s = {username, String.valueOf(getScore()), busy};
 		return s;
+	}
+	
+	public void win() {
+		gameWin++;
 	}
 	
 	

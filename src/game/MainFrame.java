@@ -15,6 +15,8 @@ import controllers.networking.client.ClientController;
 import models.DataPackage;
 import models.Destroy;
 import models.Movement;
+import models.Record;
+import models.Rematch;
 import models.User;
 
 import java.awt.Color;
@@ -40,7 +42,8 @@ import javax.swing.JButton;
 
 
 public class MainFrame extends JFrame {
-
+	private int id;
+	private int move;
 	private static final long serialVersionUID = 1L;
 	public static final int FRAME_WIDTH = 565;
 	public static final int FRAME_HEIGHT = 700;
@@ -83,11 +86,21 @@ public class MainFrame extends JFrame {
 		timeThread.stop();
 	}
 	
+	public int getMove() {
+		return move;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
 	/**
 	 * This is the default constructor
 	 */
-	public MainFrame() {
+	public MainFrame(int id) {
 		super();
+		this.id = id;
+		move = 0;
 		initialize();
 		// for double buffering
 		timeThread = new TimeThread();
@@ -179,6 +192,7 @@ public class MainFrame extends JFrame {
 		jPanel.add(jLabel,null);	
 		return jContentPane;
 	}
+	
 
 	/**
 	 * This method initializes jPanel	
@@ -261,6 +275,8 @@ public class MainFrame extends JFrame {
         	if (chose == JOptionPane.YES_OPTION) {
         		DataPackage dp = new DataPackage(UserController.getInstance().getUser(), PlayerController.getInstance().getUser(), ActionType.EXIT);
         		ClientController.getInstance().sendData(dp);
+        		Record record = new Record(id, UserController.getInstance().getUser(), move, false);
+        		dp = new DataPackage(record, ActionType.END_GAME);
         		dispose();
         		HomeController.getInstance().displayView();
         	}
@@ -594,6 +610,7 @@ public class MainFrame extends JFrame {
 							Movement mov = new Movement(chessIndex, transportX, transportY);
 							DataPackage dp = new DataPackage(mov, UserController.getInstance().getUser(), PlayerController.getInstance().getUser(), ActionType.MOVE);
 							ClientController.getInstance().sendData(dp);
+							move++;
 							countDown = 30;
 							//2.2 as there is no chess be destroyed, the eatenChess is null and we use a movedChess to store the moved chess
 							eatenChessPre = eatenChess;
@@ -641,6 +658,7 @@ public class MainFrame extends JFrame {
 							Movement mov = new Movement(chessIndex, transportX, transportY);
 							DataPackage dp = new DataPackage(mov, UserController.getInstance().getUser(), PlayerController.getInstance().getUser(), ActionType.MOVE);
 							ClientController.getInstance().sendData(dp);
+							move++;
 							countDown = 30;
 							//2.2 as there is no chess be destroyed, the eatenChess is null and we use a movedChess to store the moved chess
 							eatenChessPre = eatenChess;
@@ -805,6 +823,7 @@ public class MainFrame extends JFrame {
 						Destroy des = new Destroy(hitChess, destroyedChess);
 						DataPackage dp = new DataPackage(des, UserController.getInstance().getUser(), PlayerController.getInstance().getUser(), ActionType.DESTROY);
 						ClientController.getInstance().sendData(dp);
+						move++;
 						countDown = 30;
 						
 						b.dead();
@@ -855,6 +874,7 @@ public class MainFrame extends JFrame {
 						Destroy des = new Destroy(hitChess, destroyedChess);
 						DataPackage dp = new DataPackage(des, UserController.getInstance().getUser(), PlayerController.getInstance().getUser(), ActionType.DESTROY);
 						ClientController.getInstance().sendData(dp);		
+						move++;
 						countDown = 30;
 						r.dead();
 						//Remove the red chess component from the chess board panel
@@ -872,20 +892,45 @@ public class MainFrame extends JFrame {
 			// write your code here!
 			//If one of the chess group die, then the game is over
 			if ((!this.cg1.isAlive()) || (!this.cg2.isAlive())) {
+				stopTime();
+				boolean win = false;
 				isOver = true;//game over
 				//If the red chess died, then a message dialog will jump out to show us the red loses, and game is over 
 				if (!this.cg1.isAlive()) {
-					if (isMaster) 
-						JOptionPane.showMessageDialog(null, "YOU WON!", "Game Over!", -1);		
-					else 
-						JOptionPane.showMessageDialog(null, "YOU LOSE!", "Game Over!", -1);
+					if (isMaster) {
+						JOptionPane.showMessageDialog(null, "Congats, You Won!", "Game Over!", -1);		
+						win = true;
+					} else {
+						JOptionPane.showMessageDialog(null, "Unfortunately ,You Lose!", "Game Over!", -1);
+						win = false;
+					}
 				 } 
-				 else{//If the black chess died, then a message dialog will jump out to show us the black loses, and game is over 
-					 if (isMaster) 
-						JOptionPane.showMessageDialog(null, "YOU WON!", "Game Over!", -1);		
-					else 
-						JOptionPane.showMessageDialog(null, "YOU LOSE!", "Game Over!", -1);
+				 else {//If the black chess died, then a message dialog will jump out to show us the black loses, and game is over 
+					 if (!isMaster) {
+						JOptionPane.showMessageDialog(null, "Congats, You Won!", "Game Over!", -1);		
+						win = true;
+					 } else {
+						JOptionPane.showMessageDialog(null, "Unfortunately ,You Lose!", "Game Over!", -1);
+						win = false;
+					 }
 				 }	
+				Record record;
+				if (win) {
+					record = new Record(id, UserController.getInstance().getUser(), move, true);
+				}
+				else {
+					record = new Record(id, UserController.getInstance().getUser(), move, false);
+				}
+				ClientController.getInstance().sendData(new DataPackage(record, ActionType.END_GAME));
+				int option = JOptionPane.showConfirmDialog(null, "Do you want to rematch?", "Rematch", JOptionPane.YES_NO_OPTION);
+				if (option == JOptionPane.YES_OPTION) 
+					ClientController.getInstance().sendData(new DataPackage(new Rematch(id, true), ActionType.REMATCH));
+				else {
+					ClientController.getInstance().sendData(new DataPackage(new Rematch(id, false), ActionType.REMATCH));
+					GameController.getInstance().quit();
+					HomeController.getInstance().displayView();
+				}
+					
 			 }
 				
 			 try{//check the sentence
@@ -996,19 +1041,44 @@ public class MainFrame extends JFrame {
 		// write your code here!
 		//If one of the chess group die, then the game is over
 		if ((!red.isAlive()) || (!black.isAlive())) {
+			stopTime();
 			isOver = true;//game over
+			boolean win = false;
 			//If the red chess died, then a message dialog will jump out to show us the red loses, and game is over 
 			if (!red.isAlive()) {
-				if (isMaster) 
-				JOptionPane.showMessageDialog(this, "Congats, You Won!", "Game Over!", -1);		
-			else 
-				JOptionPane.showMessageDialog(this, "Unfortunately ,You Lose!", "Game Over!", -1);
-		 } 
-			else {//If the black chess died, then a message dialog will jump out to show us the black loses, and game is over 
-				if (isMaster) 
+				if (isMaster) {
 					JOptionPane.showMessageDialog(this, "Congats, You Won!", "Game Over!", -1);		
-				else 
+					win = true;
+				}
+				else {
 					JOptionPane.showMessageDialog(this, "Unfortunately ,You Lose!", "Game Over!", -1);
+					win = false;
+				} 
+			} else {//If the black chess died, then a message dialog will jump out to show us the black loses, and game is over 
+				if (!isMaster) {
+					JOptionPane.showMessageDialog(this, "Congats, You Won!", "Game Over!", -1);	
+					win = true;
+				}
+				else {
+					JOptionPane.showMessageDialog(this, "Unfortunately ,You Lose!", "Game Over!", -1);
+					win = false;
+				}
+			}
+			Record record;
+			if (win) {
+				record = new Record(id, UserController.getInstance().getUser(), move, true);
+			}
+			else {
+				record = new Record(id, UserController.getInstance().getUser(), move, false);
+			}
+			ClientController.getInstance().sendData(new DataPackage(record, ActionType.END_GAME));
+			int option = JOptionPane.showConfirmDialog(null, "Do you want to rematch?", "Rematch", JOptionPane.YES_NO_OPTION);
+			if (option == JOptionPane.YES_OPTION) 
+				ClientController.getInstance().sendData(new DataPackage(new Rematch(id, true), ActionType.REMATCH));
+			else {
+				ClientController.getInstance().sendData(new DataPackage(new Rematch(id, false), ActionType.REMATCH));
+				GameController.getInstance().quit();
+				HomeController.getInstance().displayView();
 			}
 		 }
 	}
@@ -1039,10 +1109,6 @@ public class MainFrame extends JFrame {
 		 
 	 }
 	 
-	 public static void main(String[] args) {
-		 new MainFrame().setVisible(true);
-	 }
-	
 
 	 
 	 

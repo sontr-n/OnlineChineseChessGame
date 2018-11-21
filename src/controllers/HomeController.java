@@ -15,15 +15,15 @@ import models.User;
 import views.HomeView;
 
 public class HomeController implements BaseController {
-	private HomeView homeView;
+	private HomeView view;
 	private User user = null;
 	
 	private HomeController() {
-		homeView = new HomeView();
-		homeView.addSignOutListener(new SignOutListener());
-		homeView.addRankingListner(new RankingListener());
-		homeView.addInvitationListener(new InvitationListener());
-		homeView.addMouseAdapterTable(new MouseAdapterTable());
+		view = new HomeView();
+		view.addSignOutListener(new SignOutListener());
+		view.addRankingListener(new RankingListener());
+		view.addInvitationListener(new InvitationListener());
+		view.addMouseAdapterTable(new MouseAdapterTable());
 	}
 	
 	class SignOutListener implements ActionListener {
@@ -33,7 +33,7 @@ public class HomeController implements BaseController {
 			UserController.getInstance().setLogedIn(false);
 			ClientController.getInstance().sendData(new DataPackage(UserController.getInstance().getUser(), ActionType.SIGN_OUT));
 			
-			hiddenView();
+			hideView();
 			LoginController.getInstance().displayView();
 		}
 		
@@ -42,10 +42,10 @@ public class HomeController implements BaseController {
 	private class MouseAdapterTable extends MouseAdapter {
 		@Override
 	    public void mouseClicked(java.awt.event.MouseEvent evt) {
-	        int row = homeView.getTable().rowAtPoint(evt.getPoint());
+	        int row = view.getTable().rowAtPoint(evt.getPoint());
 	        if (row >= 0) {
-	        	String status = (String)homeView.getTable().getValueAt(row, 2);
-	        	String username = (String)homeView.getTable().getValueAt(row, 0);
+	        	String status = (String)view.getTable().getValueAt(row, 2);
+	        	String username = (String)view.getTable().getValueAt(row, 0);
 	        	user = new User(username);
 	        	if (status.equals("busy")) 
 	        		user.setBusy(true);
@@ -61,10 +61,10 @@ public class HomeController implements BaseController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (user == null) 
-				JOptionPane.showMessageDialog(homeView, "Please pick player before request");
+				JOptionPane.showMessageDialog(view, "Please pick player before request");
 			else {
 				if (user.isBusy()) {
-	        		homeView.showMessage(user.getUsername() + " is playing");
+	        		view.showMessage(user.getUsername() + " is playing");
 	        	}
 				
 				else {
@@ -75,7 +75,6 @@ public class HomeController implements BaseController {
 			
 			}
 			
-			
 		}
 		
 	}
@@ -85,7 +84,9 @@ public class HomeController implements BaseController {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
+			System.out.println("t");
+			RankingController.getInstance().displayView();
+			view.dispose();
 		}
 		
 	}
@@ -93,7 +94,7 @@ public class HomeController implements BaseController {
 	@Override
 	public void displayView() {
 		updateView();
-		homeView.setVisible(true);
+		view.setVisible(true);
 	}
 	
 	@Override
@@ -102,7 +103,7 @@ public class HomeController implements BaseController {
 	}
 	
 	private void infoUpdate() {
-		homeView.setUserInfo(UserController.getInstance().getUser());
+		view.setUserInfo(UserController.getInstance().getUser());
 	}
 	
 	
@@ -113,12 +114,12 @@ public class HomeController implements BaseController {
 	}
 
 	@Override
-	public void hiddenView() {
-		homeView.dispose();
+	public void hideView() {
+		view.dispose();
 	}
 	
 	public void updateTable(List<User> users) {
-		DefaultTableModel model = (DefaultTableModel)homeView.getTable().getModel();
+		DefaultTableModel model = (DefaultTableModel)view.getTable().getModel();
 		int rows = model.getRowCount();
 		for (int i = rows-1; i >= 0; --i)
 			model.removeRow(i);
@@ -135,15 +136,13 @@ public class HomeController implements BaseController {
 	}
 	
 	public void rejectedChallenge() {
-		homeView.showMessage("Your challenge was declined!");
+		view.showMessage("Your challenge was declined!");
 	}
 		
 	public void accecptedChallenge() {
 		DataPackage dp = new DataPackage(UserController.getInstance().getUser(), 
 				PlayerController.getInstance().getUser(), ActionType.CHANGE_STATUS);
 		ClientController.getInstance().sendData(dp);
-		GameController.getInstance().newGame();
-		GameController.getInstance().mf.reverseNewGame();
 	}
 	
 

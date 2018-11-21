@@ -1,5 +1,6 @@
 package controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -8,7 +9,9 @@ import controllers.networking.client.ClientController;
 import game.GameController;
 import models.DataPackage;
 import models.Destroy;
+import models.Game;
 import models.Movement;
+import models.Record;
 import models.User;
 
 public class ReceiveThreadAgent extends Thread {
@@ -17,10 +20,11 @@ public class ReceiveThreadAgent extends Thread {
 	public void run() {
 		for (;;) {
 			DataPackage dp = ClientController.getInstance().receiveData();
+			System.out.println(dp.getActionType());
 			if (dp.getActionType() == ActionType.SIGN_IN) {
 				if (dp.getData() != null) {
 					LoginController.getInstance().showMessage("Sign In Successfully");
-					LoginController.getInstance().hiddenView();
+					LoginController.getInstance().hideView();
 					
 					UserController.getInstance().setLogedIn(true);
 					UserController.getInstance().setUser((User)dp.getData());
@@ -34,7 +38,7 @@ public class ReceiveThreadAgent extends Thread {
 				boolean isOK = (Boolean)dp.getData();
 				if (isOK) {
 					RegisterController.getInstance().showMessage("Sign Up Successfully");
-					RegisterController.getInstance().hiddenView();
+					RegisterController.getInstance().hideView();
 					
 					UserController.getInstance().setUser(RegisterController.getInstance().getUser());
 					
@@ -48,7 +52,7 @@ public class ReceiveThreadAgent extends Thread {
 				users = (List<User>)dp.getData();
 				HomeController.getInstance().updateTable(users);				
 			}
-			
+			 
 			if (dp.getActionType() == ActionType.SEND_INVITATION) {
 				User sender = dp.getSender();
 				PlayerController.getInstance().setUser(sender);
@@ -56,20 +60,25 @@ public class ReceiveThreadAgent extends Thread {
 				inviteCtl.addSender(sender);
 			}
 			
-			if (dp.getActionType() == ActionType.RESPONSE_INVITATION) {
-				User sender = dp.getSender();
-				boolean data = (Boolean)dp.getData();
-				PlayerController.getInstance().setUser(sender);
-				//if accecpted
-				if (data) {
-					HomeController.getInstance().accecptedChallenge();
-					HomeController.getInstance().hiddenView();
-				}
-				//if rejected
-				else 
-					HomeController.getInstance().rejectedChallenge();
+			if (dp.getActionType() == ActionType.RESPONSE_INVITATION) 
+				HomeController.getInstance().rejectedChallenge();
 					
+			if (dp.getActionType() == ActionType.NEW_GAME) {
+				Game game = (Game) dp.getData();
+				GameController.getInstance().newGame(game.getId());
+				HomeController.getInstance().hideView();
+				if (UserController.getInstance().getUser().getUsername().equals(game.getPlayFirst())) {
+					GameController.getInstance().mf.isMaster = true;
+					GameController.getInstance().mf.normalNewGame();
+					PlayerController.getInstance().setUser(game.getPlayer2());
+				}
+				else {
+					GameController.getInstance().mf.isMaster = false;
+					GameController.getInstance().mf.reverseNewGame();
+					PlayerController.getInstance().setUser(game.getPlayer1());
+				}
 			}
+			
 			if (dp.getActionType() == ActionType.REMATCH) {
 				
 			}
@@ -88,8 +97,24 @@ public class ReceiveThreadAgent extends Thread {
 				String name = PlayerController.getInstance().getUser().getUsername();
 				GameController.getInstance().mf.stopTime();
 				JOptionPane.showMessageDialog(GameController.getInstance().mf, name + " had quited, You won!");
+				Record record = new Record(GameController.getInstance().mf.getId(), UserController.getInstance().getUser(), GameController.getInstance().mf.getMove(), true);
+				DataPackage dp2 = new DataPackage(record, ActionType.END_GAME);
+				ClientController.getInstance().sendData(dp2);
 				GameController.getInstance().quit();
 				HomeController.getInstance().displayView();
+			}
+			
+			if (dp.getActionType() == ActionType.UPDATE_USER) {
+				User u = (User) dp.getData();
+				UserController.getInstance().setUser(u);
+				HomeController.getInstance().updateView();
+			}
+			
+			if (dp.getActionType() == ActionType.UPDATE_RANK) {
+				ArrayList<User> users = (ArrayList<User>)dp.getData();
+				RankingController.getInstance().updateTable1(users);
+				RankingController.getInstance().updateTable2(users);
+				RankingController.getInstance().updateTable3(users);
 			}
 			
 			

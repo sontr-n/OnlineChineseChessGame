@@ -13,4 +13,8 @@ public enum ActionType {
 	MOVE,
 	DESTROY,
 	EXIT,
+	NEW_GAME,
+	END_GAME,
+	UPDATE_RANK,
+	UPDATE_USER
 }

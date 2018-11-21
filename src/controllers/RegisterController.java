@@ -44,7 +44,7 @@ public class RegisterController implements BaseController {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			hiddenView();
+			hideView();
 			LoginController.getInstance().displayView();
 			
 		}
@@ -69,21 +69,11 @@ public class RegisterController implements BaseController {
 	
 
 	@Override
-	public void hiddenView() {
+	public void hideView() {
 		registerView.dispose();
 	}
 	
-	public boolean addUser(User u) {
-		//connect DB
-		DAO dao = new DAO();
-		String sql = "INSERT INTO users (username, password) values (?, ?)";
-		Object[] params = new Object[] {u.getUsername(), u.getPassword()};
-		int count = dao.executeUpdate(sql, params);
-		dao.closeConnection();
-		if (count > 0)
-			return true;
-		return false;
-	}
+	
 	
 	public void showMessage(String msg) {
 		registerView.showMessage(msg);

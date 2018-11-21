@@ -156,8 +156,8 @@ public class HomeView extends JFrame {
 		btnSignOut.addActionListener(so);
 	}
 	
-	public void addRankingListner(ActionListener r) {
-		btnSignOut.addActionListener(r);
+	public void addRankingListener(ActionListener r) {
+		btnRanking.addActionListener(r);
 	}
 	
 	public void showMessage(String msg) {

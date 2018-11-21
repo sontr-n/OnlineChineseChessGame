@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 
 import utils.DatabaseConfig;
 
@@ -30,6 +29,20 @@ public class DAO {
 			ex.printStackTrace();
 		}
 	}
+	
+	
+	public ResultSet executeQuery(String sql) {
+		try {
+			openConnection();
+			Statement stm = con.createStatement();
+			ResultSet rs = stm.executeQuery(sql);
+			return rs;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	
 	public ResultSet executeQuery(String sql, Object[] params) {
 		try {
@@ -57,8 +70,8 @@ public class DAO {
 			for (int i = 0; i < params.length; ++i) {
 				if (params[i] instanceof String)
 					stm.setString(i+1, (String)params[i]);
-				if (params[i] instanceof Double)
-					stm.setDouble(i+1, (Double)params[i]);
+				if (params[i] instanceof Integer)
+					stm.setInt(i+1, (Integer)params[i]);
 			}
 			count = stm.executeUpdate();
 		} catch (SQLException e) {

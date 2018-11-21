@@ -6,8 +6,8 @@ public class GameController {
 
 	}
 	
-	public void newGame() {
-		mf = new MainFrame();
+	public void newGame(int id) {
+		mf = new MainFrame(id);
 		mf.setVisible(true);
 	}
 	

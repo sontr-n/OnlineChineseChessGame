@@ -32,10 +32,7 @@ public class InvitationController {
 			isPicked = true;
 			ClientController.getInstance().sendData(new DataPackage(new Boolean(true), sender, receiver, ActionType.RESPONSE_INVITATION));
 			view.dispose();
-			HomeController.getInstance().hiddenView();
-			GameController.getInstance().newGame();
-			GameController.getInstance().mf.isMaster = true;
-			GameController.getInstance().mf.normalNewGame();
+			HomeController.getInstance().hideView();
 		}
 		
 	}
