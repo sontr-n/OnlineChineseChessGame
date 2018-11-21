@@ -70,6 +70,7 @@ public class HomeController implements BaseController {
 				else {
 					User sender = UserController.getInstance().getUser();
 		        	User receiver = new User(user.getUsername()); 
+					PlayerController.getInstance().setUser(receiver);
 		        	ClientController.getInstance().sendData(new DataPackage(sender, receiver, ActionType.SEND_INVITATION));
 				}
 			
@@ -125,7 +126,7 @@ public class HomeController implements BaseController {
 			model.removeRow(i);
 		for (User u : users) {
 			if (!u.getUsername().equals(UserController.getInstance().getUser().getUsername()))
-			model.addRow(u.toObject());
+				model.addRow(u.toObject());
 		}
 	}
 	

@@ -121,7 +121,7 @@ public class MainFrame extends JFrame {
 		}
 		
 		public void runTimer() {
-			while (countDown > 0 || !isOver) {
+			while (countDown > 0 && !isOver) {
 				try {
 					Thread.sleep(1000L);
 					countDown--;
@@ -658,6 +658,7 @@ public class MainFrame extends JFrame {
 							Movement mov = new Movement(chessIndex, transportX, transportY);
 							DataPackage dp = new DataPackage(mov, UserController.getInstance().getUser(), PlayerController.getInstance().getUser(), ActionType.MOVE);
 							ClientController.getInstance().sendData(dp);
+							System.out.println(PlayerController.getInstance().getUser().getUsername());
 							move++;
 							countDown = 30;
 							//2.2 as there is no chess be destroyed, the eatenChess is null and we use a movedChess to store the moved chess
@@ -892,7 +893,6 @@ public class MainFrame extends JFrame {
 			// write your code here!
 			//If one of the chess group die, then the game is over
 			if ((!this.cg1.isAlive()) || (!this.cg2.isAlive())) {
-				stopTime();
 				boolean win = false;
 				isOver = true;//game over
 				//If the red chess died, then a message dialog will jump out to show us the red loses, and game is over 
@@ -1041,7 +1041,6 @@ public class MainFrame extends JFrame {
 		// write your code here!
 		//If one of the chess group die, then the game is over
 		if ((!red.isAlive()) || (!black.isAlive())) {
-			stopTime();
 			isOver = true;//game over
 			boolean win = false;
 			//If the red chess died, then a message dialog will jump out to show us the red loses, and game is over 

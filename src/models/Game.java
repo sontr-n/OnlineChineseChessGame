@@ -41,8 +41,8 @@ public class Game implements Serializable {
 	
 	public void reset() {
 		winner = "";
-		p1Moved = -1;
-		p2Moved = -1;
+		p1Moved = 0;
+		p2Moved = 0;
 		p1Rematch = -1;
 		p2Rematch = -1;
 	}

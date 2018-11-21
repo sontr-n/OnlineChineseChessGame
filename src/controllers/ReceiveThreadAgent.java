@@ -70,12 +70,9 @@ public class ReceiveThreadAgent extends Thread {
 				if (UserController.getInstance().getUser().getUsername().equals(game.getPlayFirst())) {
 					GameController.getInstance().mf.isMaster = true;
 					GameController.getInstance().mf.normalNewGame();
-					PlayerController.getInstance().setUser(game.getPlayer2());
 				}
 				else {
-					GameController.getInstance().mf.isMaster = false;
 					GameController.getInstance().mf.reverseNewGame();
-					PlayerController.getInstance().setUser(game.getPlayer1());
 				}
 			}
 			
@@ -106,6 +103,7 @@ public class ReceiveThreadAgent extends Thread {
 			
 			if (dp.getActionType() == ActionType.UPDATE_USER) {
 				User u = (User) dp.getData();
+				System.out.println(u.getScore());
 				UserController.getInstance().setUser(u);
 				HomeController.getInstance().updateView();
 			}

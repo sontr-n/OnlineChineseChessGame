@@ -62,6 +62,10 @@ public class User implements Serializable {
 		this.password = p;
 		isBusy = false;
 		score = 0;
+		moveLose = 0;
+		moveWin = 0;
+		gameWin = 0;
+		gameLose = 0;
 	}
 	
 	public User(int id, String u, char[] p, double s) {
@@ -113,7 +117,7 @@ public class User implements Serializable {
 	
 	public double getAverageMoveWin() {
 		if (gameWin == 0) return 0;
-		return Math.round(((double)moveWin) / gameWin);
+		return ((double)moveWin) / gameWin;
 	}
 	
 	public double getAverageMoveLose() {
