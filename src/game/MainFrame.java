@@ -843,48 +843,48 @@ public class MainFrame extends JFrame {
 					}
 					//In the normal situation
 					if ((this.cg1.getNumTaken() == 1) && (this.cg2.getNumTaken() == 1)){
-					Chess r = (Chess)this.cg1.getChess().get(this.cg1.getIndex());//chess r is the chosen red chess, in this term, the eaten one 
-					Chess b = (Chess)this.cg2.getChess().get(this.cg2.getIndex());//chess b is the chosen black chess
-					int hitChess = this.cg2.getIndex(), destroyedChess = this.cg1.getIndex();
-					//Set the index of the red chess as the target index 
-					int x = r.getIndX();
-					int y = r.getIndY();
-					//set the index of the black chess as the source index
-					int old_x = b.getIndX();
-					int old_y = b.getIndY();
-					//We will use the chess rule to determine whether the destroy of chess can take place
-					if (b.getRank().equals("pao"))
-						ChessRule.cannonRule(cb, b, r);
-					//If the general move into the same column and there is no chess between them, the latter coming general will dead
-					else if(b.getRank().equals("jiang") && r.getRank().equals("jiang")){
-						ChessRule.generaFlylRule(cb, b, r);
-					}
-					else{
-						ChessRule.AllRules(cb, b, x, y);
-					}
+						Chess r = (Chess)this.cg1.getChess().get(this.cg1.getIndex());//chess r is the chosen red chess, in this term, the eaten one 
+						Chess b = (Chess)this.cg2.getChess().get(this.cg2.getIndex());//chess b is the chosen black chess
+						int hitChess = this.cg2.getIndex(), destroyedChess = this.cg1.getIndex();
+						//Set the index of the red chess as the target index 
+						int x = r.getIndX();
+						int y = r.getIndY();
+						//set the index of the black chess as the source index
+						int old_x = b.getIndX();
+						int old_y = b.getIndY();
+						//We will use the chess rule to determine whether the destroy of chess can take place
+						if (b.getRank().equals("pao"))
+							ChessRule.cannonRule(cb, b, r);
+						//If the general move into the same column and there is no chess between them, the latter coming general will dead
+						else if(b.getRank().equals("jiang") && r.getRank().equals("jiang")){
+							ChessRule.generaFlylRule(cb, b, r);
+						}
+						else {
+							ChessRule.AllRules(cb, b, x, y);
+						}
 					
-					if ((old_x != b.getIndX()) || (old_y != b.getIndY())) {//eat and print code
-						//Remove the red chess component from the chess board panel
-						eatenChessPre = eatenChess;
-						eatenChess = r;
-						//Make changes for the red side to walk
-						RedPlay = true;
-						//give the turn to the opponent
-						canGo = false;
-						changeSideFlag();//Set information for the label on the upper-right corner to acknowledge the player to move
-						Destroy des = new Destroy(hitChess, destroyedChess);
-						DataPackage dp = new DataPackage(des, UserController.getInstance().getUser(), PlayerController.getInstance().getUser(), ActionType.DESTROY);
-						ClientController.getInstance().sendData(dp);		
-						move++;
-						countDown = 30;
-						r.dead();
-						//Remove the red chess component from the chess board panel
-						jPanel.remove(r);				
-						//we use the eatenChess and the movedChess to store the chess eaten or moved
-						movedChessPre = movedChess;
-						movedChess = b;
-						
-					}
+						if ((old_x != b.getIndX()) || (old_y != b.getIndY())) {//eat and print code
+							//Remove the red chess component from the chess board panel
+							eatenChessPre = eatenChess;
+							eatenChess = r;
+							//Make changes for the red side to walk
+							RedPlay = true;
+							//give the turn to the opponent
+							canGo = false;
+							changeSideFlag();//Set information for the label on the upper-right corner to acknowledge the player to move
+							Destroy des = new Destroy(hitChess, destroyedChess);
+							DataPackage dp = new DataPackage(des, UserController.getInstance().getUser(), PlayerController.getInstance().getUser(), ActionType.DESTROY);
+							ClientController.getInstance().sendData(dp);		
+							move++;
+							countDown = 30;
+							r.dead();
+							//Remove the red chess component from the chess board panel
+							jPanel.remove(r);				
+							//we use the eatenChess and the movedChess to store the chess eaten or moved
+							movedChessPre = movedChess;
+							movedChess = b;
+							
+						}
 					}
 				 }
 					

@@ -14,8 +14,6 @@ import java.util.List;
 
 import controllers.ActionType;
 import controllers.DAO;
-import controllers.LoginController;
-import controllers.RegisterController;
 import models.DataPackage;
 import models.Game;
 import models.Record;
@@ -137,6 +135,7 @@ public class ServerController {
 					addUser(u, oos);
 					oos.reset();
 					oos.writeObject(new DataPackage(new Boolean(true), ActionType.SIGN_UP));
+					handleUpdateRank();
 					handleUpdateTable();
 				}
 				else {
@@ -387,39 +386,42 @@ public class ServerController {
 				}
 			}
 			handleUpdateUser(game.getWinner());
-			handleUpdateTable();
-			DAO dao = new DAO();
-			//insert into games
-			String sql = "INSERT INTO games (user1, user2, winner) VALUES (?, ?, ?)";
-			Object[] params;
-			params = new Object[] {user1, user2, game.getWinner()};
-			dao.executeUpdate(sql, params);
-			//update users
-			sql = "UPDATE users SET win=win+1 WHERE username=?";
-			params = new Object[] {game.getWinner()};
-			dao.executeUpdate(sql, params);
-			sql = "UPDATE users SET lose=lose+1 WHERE username=?";
-			params = new Object[] {loser};
-			dao.executeUpdate(sql, params);
-			//get ID game
-			int gameId = -1;
-			sql = "SELECT * FROM games WHERE (time=(SELECT MAX(time) FROM games WHERE (user1=? AND user2=?)))";
-			params = new Object[] {user1, user2};
-			ResultSet rs = dao.executeQuery(sql, params);
-			try {
-				rs.next();
-				gameId = rs.getInt("gameId");
-				//insert moves into record
-				sql = "INSERT INTO records (gameId, user, move) VALUES (?, ?, ?)";
-				params = new Object[] {gameId, user1, game.getP1Moved()};
+			
+			if (game.getP2Moved() != -1 && game.getP1Moved() != -1) {
+				DAO dao = new DAO();
+				//insert into games
+				String sql = "INSERT INTO games (user1, user2, winner) VALUES (?, ?, ?)";
+				Object[] params;
+				params = new Object[] {user1, user2, game.getWinner()};
 				dao.executeUpdate(sql, params);
-				params = new Object[] {gameId, user2, game.getP2Moved()};
+				//update users
+				sql = "UPDATE users SET win=win+1 WHERE username=?";
+				params = new Object[] {game.getWinner()};
 				dao.executeUpdate(sql, params);
-			} catch (SQLException e) {
-				e.printStackTrace();
+				sql = "UPDATE users SET lose=lose+1 WHERE username=?";
+				params = new Object[] {loser};
+				dao.executeUpdate(sql, params);
+				//get ID game
+				int gameId = -1;
+				sql = "SELECT * FROM games WHERE (time=(SELECT MAX(time) FROM games WHERE (user1=? AND user2=?)))";
+				params = new Object[] {user1, user2};
+				ResultSet rs = dao.executeQuery(sql, params);
+				try {
+					rs.next();
+					gameId = rs.getInt("gameId");
+					//insert moves into record
+					sql = "INSERT INTO records (gameId, user, move) VALUES (?, ?, ?)";
+					params = new Object[] {gameId, user1, game.getP1Moved()};
+					dao.executeUpdate(sql, params);
+					params = new Object[] {gameId, user2, game.getP2Moved()};
+					dao.executeUpdate(sql, params);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				dao.closeConnection();
+				handleUpdateTable();
+				handleUpdateRank();
 			}
-			dao.closeConnection();
-			handleUpdateRank();
 		}
 		
 		private void handleUpdateUser(String username) {

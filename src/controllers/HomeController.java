@@ -9,7 +9,6 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 import controllers.networking.client.ClientController;
-import game.GameController;
 import models.DataPackage;
 import models.User;
 import views.HomeView;
